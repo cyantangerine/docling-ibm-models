@@ -80,13 +80,15 @@ class CodeFormulaPredictor:
         if device == "cpu":
             torch.set_num_threads(self._num_threads)
 
+        print("Code Device: ", self._device)
         self._tokenizer = AutoTokenizer.from_pretrained(
-            artifacts_path, use_fast=True, padding_side="left"
+            artifacts_path, use_fast=True, padding_side="left",
+            device_map=self._device
         )
-        self._model = SamOPTForCausalLM.from_pretrained(artifacts_path).to(self._device)
+        self._model = SamOPTForCausalLM.from_pretrained(artifacts_path, device_map=self._device) # .to(self._device)
         self._model.eval()
 
-        self._image_processor = SamOptImageProcessor.from_pretrained(artifacts_path)
+        self._image_processor = SamOptImageProcessor.from_pretrained(artifacts_path, device_map=self._device)
 
         _log.debug("CodeFormulaModel settings: {}".format(self.info()))
 
